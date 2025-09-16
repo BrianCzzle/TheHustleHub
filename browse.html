@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hustlers | HustleHub</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="styles/browse.css" />
+</head>
+
+<body>
+  <header>
+    <div class="top-bar">
+      <span id="welcomeUser"></span>
+      <button id="logoutBtn">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hustlers-section">
+      <h2>Available Hustlers Near You</h2>
+      
+      <!-- New: Search and Filter Bar -->
+      <div class="filters-bar">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search skills or services..." style="text-align: center;">
+        </div>
+        <select id="locationFilter">
+          <option value="">All Locations</option>
+          <option value="Elukwatini">Elukwatini</option>
+          <option value="Johannesburg">Johannesburg</option>
+          <option value="Cape Town">Cape Town</option>
+          <!-- More locations will be dynamically added -->
+        </select>
+        <select id="rateFilter">
+          <option value="">Any Rate</option>
+          <option value="0-1000">Under ZAR 1000</option>
+          <option value="1000-5000">ZAR 1000 - 5000</option>
+          <option value="5000+">ZAR 5000+</option>
+        </select>
+      </div>
+      
+      <div id="hustlersList" class="card-grid"></div>
+      
+      <!-- New: No results message -->
+      <div id="noResults" style="display: none; text-align: center; padding: 2rem;">
+        <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+        <h3>No hustlers found</h3>
+        <p>Try adjusting your filters or search terms</p>
+      </div>
+    </section>
+  </main>
+
+  <script src="script/browse.js" defer></script>
+</body>
+</html>
