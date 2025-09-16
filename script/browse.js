@@ -1,3 +1,24 @@
+// --- Firebase Setup ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  get,
+  child,
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCjp85WZDZbVHzIyqSO1ZkOZKcHwrGx9Q0",
+  authDomain: "thehustlehub-c39ed.firebaseapp.com",
+  databaseURL: "https://thehustlehub-c39ed-default-rtdb.firebaseio.com",
+  projectId: "thehustlehub-c39ed",
+  storageBucket: "thehustlehub-c39ed.appspot.com",
+  messagingSenderId: "315377229226",
+  appId: "1:315377229226:web:741d9d45f0e5adfdabdfd3",
+  measurementId: "G-WW94CRTJRJ",
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 console.log("🌐 browse.js loaded");
 
 // Get the current user from localStorage
@@ -15,78 +36,81 @@ logoutBtn.addEventListener("click", () => {
 // If hustler is logged in
 if (currentUser) {
   welcomeUser.textContent = `Hey, ${currentUser.username}`;
-  welcomeUser.setAttribute('data-user', 'true');
+  welcomeUser.setAttribute("data-user", "true");
   logoutBtn.style.display = "inline-block"; // Show logout
 } else {
   // Client browsing, hide login-specific stuff
   welcomeUser.textContent = `Welcome, visitor.`;
-  welcomeUser.removeAttribute('data-user');
+  welcomeUser.removeAttribute("data-user");
   logoutBtn.style.display = "none"; // Hide logout
 }
 
-// Get all users from localStorage
-import { get, ref, child } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
-
-const dbRef = ref(db);
-let allUsers = [];
-
-await get(child(dbRef, "users"))
-  .then(snapshot => {
-    if (snapshot.exists()) {
-      allUsers = Object.values(snapshot.val());
-    }
-  })
-  .catch(err => console.error("Error fetching users:", err));
-
-console.log("👥 All users:", allUsers);
-console.log("👤 Current user:", currentUser);
-
-// Filter out the current user if logged in
-const hustlers = currentUser 
-  ? allUsers.filter(user => user.email !== currentUser.email) 
-  : allUsers;
-
-console.log("🧠 Hustlers list:", hustlers);
-
-// Render hustlers
+// Fetch all users from Firebase
 const hustlersList = document.getElementById("hustlersList");
+let hustlers = [];
 
-if (hustlers.length === 0) {
-  hustlersList.innerHTML = "<p>No hustlers found. Be the first to sign up!</p>";
-} else {
-  renderHustlers(hustlers);
-  populateLocationFilter(hustlers);
-  setupFilterListeners();
-}
+get(ref(db, "users")).then((snapshot) => {
+  if (snapshot.exists()) {
+    const allUsers = Object.values(snapshot.val());
+    // Filter out the current user if logged in
+    hustlers = currentUser
+      ? allUsers.filter((user) => user.email !== currentUser.email)
+      : allUsers;
+    console.log("👥 All users:", allUsers);
+    console.log("🧠 Hustlers list:", hustlers);
+    if (hustlers.length === 0) {
+      hustlersList.innerHTML =
+        "<p>No hustlers found. Be the first to sign up!</p>";
+    } else {
+      renderHustlers(hustlers);
+      populateLocationFilter(hustlers);
+      setupFilterListeners();
+    }
+  } else {
+    hustlersList.innerHTML =
+      "<p>No hustlers found. Be the first to sign up!</p>";
+  }
+});
 
 function renderHustlers(hustlersToRender) {
-  hustlersList.innerHTML = '';
-  
+  hustlersList.innerHTML = "";
+
   if (hustlersToRender.length === 0) {
-    document.getElementById('noResults').style.display = 'block';
+    document.getElementById("noResults").style.display = "block";
     return;
   }
-  
-  document.getElementById('noResults').style.display = 'none';
-  
-  hustlersToRender.forEach(hustler => {
+
+  document.getElementById("noResults").style.display = "none";
+
+  hustlersToRender.forEach((hustler) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.setAttribute('data-location', hustler.location || '');
-    card.setAttribute('data-rate', hustler.price || '0');
-    card.setAttribute('data-skills', hustler.description ? hustler.description.toLowerCase() : '');
-    
+    card.setAttribute("data-location", hustler.location || "");
+    card.setAttribute("data-rate", hustler.price || "0");
+    card.setAttribute(
+      "data-skills",
+      hustler.description ? hustler.description.toLowerCase() : ""
+    );
+
     const isCurrentUser = currentUser && hustler.email === currentUser.email;
 
     card.innerHTML = `
       <div style="position: relative;">
-        ${isCurrentUser ? `
+        ${
+          isCurrentUser
+            ? `
           <button id="editBtn">Edit</button>
-        ` : ""}
+        `
+            : ""
+        }
         <h3>${hustler.username}</h3>
         <p><strong>Location:</strong> ${hustler.location || "Unknown"}</p>
-        <p><strong>Skills:</strong> ${hustler.description || "No description provided."}</p>
-        <p><strong>Rate:</strong> ${hustler.price ? `ZAR ${hustler.price}` : "Negotiable"}</p>
+        <p><strong>Skills:</strong> ${
+          hustler.description || "No description provided."
+        }</p>
+        <p><strong>Rate:</strong> ${
+          hustler.price ? `ZAR ${hustler.price}` : "Negotiable"
+        }</p>
         <div class="card-actions">
           <button class="whatsappBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
           <button class="emailBtn"><i class="fas fa-envelope"></i> Email</button>
@@ -107,7 +131,7 @@ function renderHustlers(hustlersToRender) {
     emailBtn.addEventListener("click", () => {
       contactViaEmail(hustler.email);
     });
-    
+
     // Edit feature
     if (isCurrentUser) {
       const editBtn = card.querySelector("#editBtn");
@@ -120,12 +144,12 @@ function renderHustlers(hustlersToRender) {
 
 function contactViaWhatsApp(number) {
   if (!number) {
-    Swal.fire('Oops!', "This hustler didn't add a WhatsApp number.", 'warning');
+    Swal.fire("Oops!", "This hustler didn't add a WhatsApp number.", "warning");
     return;
   }
 
   // Sanitize number and prepend country code (e.g., South Africa: 27)
-  const cleaned = number.replace(/\D/g, ''); // Remove non-digits
+  const cleaned = number.replace(/\D/g, ""); // Remove non-digits
   const formatted = cleaned.startsWith("0")
     ? "27" + cleaned.slice(1) // Replace starting 0 with SA's country code
     : cleaned;
@@ -136,7 +160,7 @@ function contactViaWhatsApp(number) {
 
 function contactViaEmail(email) {
   if (!email) {
-    Swal.fire('Oops!', "No email found for this hustler.", 'warning');
+    Swal.fire("Oops!", "No email found for this hustler.", "warning");
     return;
   }
   window.location.href = `mailto:${email}`;
@@ -146,11 +170,21 @@ function editHustler(hustler) {
   Swal.fire({
     title: "Edit Your Info",
     html: `
-      <input id="editUsername" class="swal2-input" placeholder="Username" value="${hustler.username}">
-      <input id="editLocation" class="swal2-input" placeholder="Location" value="${hustler.location || ""}">
-      <input id="editDescription" class="swal2-input" placeholder="Skills / Description" value="${hustler.description || ""}">
-      <input id="editPrice" class="swal2-input" placeholder="Price" value="${hustler.price || ""}">
-      <input id="editWhatsapp" class="swal2-input" placeholder="WhatsApp Number" value="${hustler.whatsApp || ""}">
+      <input id="editUsername" class="swal2-input" placeholder="Username" value="${
+        hustler.username
+      }">
+      <input id="editLocation" class="swal2-input" placeholder="Location" value="${
+        hustler.location || ""
+      }">
+      <input id="editDescription" class="swal2-input" placeholder="Skills / Description" value="${
+        hustler.description || ""
+      }">
+      <input id="editPrice" class="swal2-input" placeholder="Price" value="${
+        hustler.price || ""
+      }">
+      <input id="editWhatsapp" class="swal2-input" placeholder="WhatsApp Number" value="${
+        hustler.whatsApp || ""
+      }">
     `,
     confirmButtonText: "Save Changes",
     focusConfirm: false,
@@ -162,13 +196,13 @@ function editHustler(hustler) {
         price: document.getElementById("editPrice").value.trim(),
         whatsApp: document.getElementById("editWhatsapp").value.trim(),
       };
-    }
-  }).then(result => {
+    },
+  }).then((result) => {
     if (result.isConfirmed) {
       const updatedData = result.value;
 
       const allUsers = JSON.parse(localStorage.getItem("users")) || [];
-      const updatedUsers = allUsers.map(user => {
+      const updatedUsers = allUsers.map((user) => {
         if (user.email === hustler.email) {
           return { ...user, ...updatedData };
         }
@@ -176,39 +210,34 @@ function editHustler(hustler) {
       });
 
       // Save updated data
-      update(ref(db, "users/" + hustler.email.replace(/\./g, "_")), updatedData)
-  .then(() => {
-    localStorage.setItem("currentUser", JSON.stringify({ ...hustler, ...updatedData }));
-    Swal.fire({
-      icon: "success",
-      title: "Profile Updated",
-      timer: 1000,
-      showConfirmButton: false
-    }).then(() => location.reload());
-  })
-  .catch(err => Swal.fire("Error", err.message, "error"));
-
+      localStorage.setItem("users", JSON.stringify(updatedUsers));
+      localStorage.setItem(
+        "currentUser",
+        JSON.stringify({ ...hustler, ...updatedData })
+      );
 
       Swal.fire({
         icon: "success",
         title: "Profile Updated",
         timer: 1000,
-        showConfirmButton: false
+        showConfirmButton: false,
       }).then(() => location.reload());
     }
   });
 }
 
 function populateLocationFilter(hustlers) {
-  const locationFilter = document.getElementById('locationFilter');
+  const locationFilter = document.getElementById("locationFilter");
   if (!locationFilter) return;
-  
+
   // Get unique locations
-  const locations = [...new Set(hustlers.map(h => h.location).filter(Boolean))];
-  
+  const locations = [
+    ...new Set(hustlers.map((h) => h.location).filter(Boolean)),
+  ];
+
   // Add locations to filter
-  locations.forEach(location => {
-    const option = document.createElement('option');
+  locations.forEach((location) => {
+    const option = document.createElement("option");
     option.value = location;
     option.textContent = location;
     locationFilter.appendChild(option);
@@ -216,41 +245,45 @@ function populateLocationFilter(hustlers) {
 }
 
 function setupFilterListeners() {
-  const searchInput = document.getElementById('searchInput');
-  const locationFilter = document.getElementById('locationFilter');
-  const rateFilter = document.getElementById('rateFilter');
-  
-  if (searchInput) searchInput.addEventListener('input', filterHustlers);
-  if (locationFilter) locationFilter.addEventListener('change', filterHustlers);
-  if (rateFilter) rateFilter.addEventListener('change', filterHustlers);
+  const searchInput = document.getElementById("searchInput");
+  const locationFilter = document.getElementById("locationFilter");
+  const rateFilter = document.getElementById("rateFilter");
+
+  if (searchInput) searchInput.addEventListener("input", filterHustlers);
+  if (locationFilter) locationFilter.addEventListener("change", filterHustlers);
+  if (rateFilter) rateFilter.addEventListener("change", filterHustlers);
 }
 
 function filterHustlers() {
-  const searchText = document.getElementById('searchInput').value.toLowerCase();
-  const locationFilter = document.getElementById('locationFilter').value;
-  const rateFilter = document.getElementById('rateFilter').value;
-  
-  const filteredHustlers = hustlers.filter(hustler => {
+  const searchText = document.getElementById("searchInput").value.toLowerCase();
+  const locationFilter = document.getElementById("locationFilter").value;
+  const rateFilter = document.getElementById("rateFilter").value;
+
+  const filteredHustlers = hustlers.filter((hustler) => {
     // Search filter
-    const matchesSearch = searchText === '' || 
+    const matchesSearch =
+      searchText === "" ||
       hustler.username.toLowerCase().includes(searchText) ||
-      (hustler.description && hustler.description.toLowerCase().includes(searchText)) ||
+      (hustler.description &&
+        hustler.description.toLowerCase().includes(searchText)) ||
       (hustler.location && hustler.location.toLowerCase().includes(searchText));
-    
+
     // Location filter
-    const matchesLocation = locationFilter === '' || hustler.location === locationFilter;
-    
+    const matchesLocation =
+      locationFilter === "" || hustler.location === locationFilter;
+
     // Rate filter
     let matchesRate = true;
-    if (rateFilter !== '' && hustler.price) {
+    if (rateFilter !== "" && hustler.price) {
       const price = parseInt(hustler.price);
-      if (rateFilter === '0-1000') matchesRate = price <= 1000;
-      else if (rateFilter === '1000-5000') matchesRate = price > 1000 && price <= 5000;
-      else if (rateFilter === '5000+') matchesRate = price > 5000;
+      if (rateFilter === "0-1000") matchesRate = price <= 1000;
+      else if (rateFilter === "1000-5000")
+        matchesRate = price > 1000 && price <= 5000;
+      else if (rateFilter === "5000+") matchesRate = price > 5000;
     }
-    
+
     return matchesSearch && matchesLocation && matchesRate;
   });
-  
+
   renderHustlers(filteredHustlers);
 }

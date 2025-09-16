@@ -1,23 +1,26 @@
-// Import Firebase SDK
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set, get, child, push } from "firebase/database";
+// --- Firebase Setup ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  set,
+  get,
+  child,
+  push,
+} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
 
-// Your Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyCjp85WZDZbVHzIyqSO1ZkOZKcHwrGx9Q0",
   authDomain: "thehustlehub-c39ed.firebaseapp.com",
   databaseURL: "https://thehustlehub-c39ed-default-rtdb.firebaseio.com",
   projectId: "thehustlehub-c39ed",
-  storageBucket: "thehustlehub-c39ed.firebasestorage.app",
+  storageBucket: "thehustlehub-c39ed.appspot.com",
   messagingSenderId: "315377229226",
   appId: "1:315377229226:web:741d9d45f0e5adfdabdfd3",
-  measurementId: "G-WW94CRTJRJ"
+  measurementId: "G-WW94CRTJRJ",
 };
-
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
-
 // FORM ELEMENTS
 const form = document.getElementById("loginForm");
 const emailInput = document.getElementById("email");
@@ -87,8 +90,6 @@ function playSound(type) {
   );
   audio.play();
 }
-
-
 
 // 🎛️ Switching between forms
 goToLogin.addEventListener("click", () => {
@@ -177,19 +178,19 @@ signupForm.addEventListener("submit", (e) => {
     return;
   }
 
-  // 5. Check for duplicate email
- const usersRef = ref(db, "users");
-get(usersRef).then(snapshot => {
-  if (snapshot.exists()) {
-    const users = Object.values(snapshot.val());
-    const emailExists = users.some(user => user.email.toLowerCase() === email);
-
+  // 5. Check for duplicate email in Firebase
+  const usersRef = ref(db, "users");
+  get(usersRef).then((snapshot) => {
+    let emailExists = false;
+    if (snapshot.exists()) {
+      const users = Object.values(snapshot.val());
+      emailExists = users.some((user) => user.email.toLowerCase() === email);
+    }
     if (emailExists) {
       showError("This email is already registered. Try logging in instead.");
       return;
     }
-
-    // Save new user
+    // Save new user to Firebase
     const newUserRef = push(usersRef);
     set(newUserRef, {
       username,
@@ -198,52 +199,12 @@ get(usersRef).then(snapshot => {
       location,
       description,
       price,
-      whatsApp
+      whatsApp,
     }).then(() => {
       showSuccess("Signup successful!");
       signupForm.reset();
     });
-  } else {
-    // No users yet → directly create
-    const newUserRef = push(usersRef);
-    set(newUserRef, {
-      username,
-      email,
-      password,
-      location,
-      description,
-      price,
-      whatsApp
-    }).then(() => {
-      showSuccess("Signup successful!");
-      signupForm.reset();
-    });
-  }
-});
-
-
-  if (emailExists) {
-    showError("This email is already registered. Try logging in instead.");
-    return;
-  }
-
-  // 6. Create new user object
-  const newUser = {
-    username,
-    email,
-    password,
-    location,
-    description,
-    price,
-    whatsApp
-  };
-
-  // 7. Save user and confirm
-  storedUsers.push(newUser);
-  localStorage.setItem("users", JSON.stringify(storedUsers));
-  showSuccess("Signup successful!");
-
-  signupForm.reset();
+  });
 });
 
 // Login
@@ -258,40 +219,27 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
+  // Fetch users from Firebase and check credentials
   const usersRef = ref(db, "users");
-get(usersRef).then(snapshot => {
-  if (snapshot.exists()) {
-    const users = Object.values(snapshot.val());
-    const matchedUser = users.find(
-      user => user.email.toLowerCase() === email && user.password === password
-    );
-
-    if (matchedUser) {
-      localStorage.setItem("currentUser", JSON.stringify(matchedUser));
-      showSuccess(`Hey ${matchedUser.username}, welcome back!`);
-      setTimeout(() => {
-        window.location.href = "browse.html";
-      }, 1000);
-      form.reset();
+  get(usersRef).then((snapshot) => {
+    if (snapshot.exists()) {
+      const users = Object.values(snapshot.val());
+      const matchedUser = users.find(
+        (user) =>
+          user.email.toLowerCase() === email && user.password === password
+      );
+      if (matchedUser) {
+        localStorage.setItem("currentUser", JSON.stringify(matchedUser));
+        showSuccess(`Hey ${matchedUser.username}, welcome back!`);
+        setTimeout(() => {
+          window.location.href = "browse.html";
+        }, 1000);
+        form.reset();
+      } else {
+        showError("Invalid email or password. Try again.");
+      }
     } else {
-      showError("Invalid email or password. Try again.");
+      showError("No users found. Please sign up first.");
     }
-  } else {
-    showError("No users found. Please sign up first.");
-  }
-});
-
-
-  if (matchedUser) {
-    localStorage.setItem("currentUser", JSON.stringify(matchedUser));
-    showSuccess(`Hey ${matchedUser.username}, welcome back!`);
-
-    setTimeout(() => {
-      window.location.href = "browse.html";
-    }, 1000);
-
-    form.reset();
-  } else {
-    showError("Invalid email or password. Try again.");
-  }
+  });
 });
