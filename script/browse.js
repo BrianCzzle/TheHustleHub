@@ -52,10 +52,8 @@ let hustlers = [];
 get(ref(db, "users")).then((snapshot) => {
   if (snapshot.exists()) {
     const allUsers = Object.values(snapshot.val());
-    // Filter out the current user if logged in
-    hustlers = currentUser
-      ? allUsers.filter((user) => user.email !== currentUser.email)
-      : allUsers;
+    // Do NOT filter out the current user; show all users
+    hustlers = allUsers;
     console.log("👥 All users:", allUsers);
     console.log("🧠 Hustlers list:", hustlers);
     if (hustlers.length === 0) {
@@ -170,21 +168,12 @@ function editHustler(hustler) {
   Swal.fire({
     title: "Edit Your Info",
     html: `
-      <input id="editUsername" class="swal2-input" placeholder="Username" value="${
-        hustler.username
-      }">
-      <input id="editLocation" class="swal2-input" placeholder="Location" value="${
-        hustler.location || ""
-      }">
-      <input id="editDescription" class="swal2-input" placeholder="Skills / Description" value="${
-        hustler.description || ""
-      }">
-      <input id="editPrice" class="swal2-input" placeholder="Price" value="${
-        hustler.price || ""
-      }">
-      <input id="editWhatsapp" class="swal2-input" placeholder="WhatsApp Number" value="${
-        hustler.whatsApp || ""
-      }">
+      <input id="editUsername" class="swal2-input" placeholder="Username" value="${hustler.username}">
+      <input id="editLocation" class="swal2-input" placeholder="Location" value="${hustler.location || ''}">
+      <input id="editDescription" class="swal2-input" placeholder="Skills / Description" value="${hustler.description || ''}">
+      <input id="editPrice" class="swal2-input" placeholder="Price" value="${hustler.price || ''}">
+      <input id="editWhatsapp" class="swal2-input" placeholder="WhatsApp Number" value="${hustler.whatsApp || ''}">
+      <input id="editEmail" class="swal2-input" value="${hustler.email}" disabled style="background:#eee;cursor:not-allowed;" title="Email cannot be changed">
     `,
     confirmButtonText: "Save Changes",
     focusConfirm: false,
@@ -195,33 +184,44 @@ function editHustler(hustler) {
         description: document.getElementById("editDescription").value.trim(),
         price: document.getElementById("editPrice").value.trim(),
         whatsApp: document.getElementById("editWhatsapp").value.trim(),
+        email: hustler.email // always use original email
       };
     },
   }).then((result) => {
     if (result.isConfirmed) {
       const updatedData = result.value;
-
-      const allUsers = JSON.parse(localStorage.getItem("users")) || [];
-      const updatedUsers = allUsers.map((user) => {
-        if (user.email === hustler.email) {
-          return { ...user, ...updatedData };
+      // Find the Firebase key for this user
+      get(ref(db, "users")).then((snapshot) => {
+        if (snapshot.exists()) {
+          const usersObj = snapshot.val();
+          const userKey = Object.keys(usersObj).find(
+            (key) => usersObj[key].email === hustler.email
+          );
+          if (userKey) {
+            // Update user in Firebase
+            set(ref(db, `users/${userKey}`), {
+              ...usersObj[userKey],
+              ...updatedData,
+            })
+              .then(() => {
+                // Update currentUser in localStorage
+                localStorage.setItem(
+                  "currentUser",
+                  JSON.stringify({ ...usersObj[userKey], ...updatedData })
+                );
+                Swal.fire({
+                  icon: "success",
+                  title: "Profile Updated",
+                  timer: 1000,
+                  showConfirmButton: false,
+                }).then(() => location.reload());
+              })
+              .catch((err) => {
+                Swal.fire("Error", err.message, "error");
+              });
+          }
         }
-        return user;
       });
-
-      // Save updated data
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      localStorage.setItem(
-        "currentUser",
-        JSON.stringify({ ...hustler, ...updatedData })
-      );
-
-      Swal.fire({
-        icon: "success",
-        title: "Profile Updated",
-        timer: 1000,
-        showConfirmButton: false,
-      }).then(() => location.reload());
     }
   });
 }
