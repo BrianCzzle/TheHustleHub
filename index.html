@@ -1,11 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HustleHub | Hire Skilled Local Workers</title>
+    <meta name="description"
+        content="HustleHub connects you with top-tier local professionals for home services, repairs, and specialized tasks. Book trusted hustlers with zero commission.">
+    <meta name="keywords"
+        content="HustleHub, local workers, hire, services, professionals, home repairs, South Africa, hustlers, skilled, booking">
+    <meta name="author" content="HustleHub Team">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="HustleHub | Hire Skilled Local Workers">
+    <meta property="og:description"
+        content="Book skilled professionals for home services, repairs, and specialized tasks. No job too big or small.">
+    <meta property="og:image" content="https://yourdomain.com/assets/Logged%20in%20hustler.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:type" content="website">
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HustleHub | Hire Skilled Local Workers">
+    <meta name="twitter:description"
+        content="Book skilled professionals for home services, repairs, and specialized tasks. No job too big or small.">
+    <meta name="twitter:image" content="https://yourdomain.com/assets/Logged%20in%20hustler.png">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles/global.css">
@@ -14,6 +33,8 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+    <!-- PWA manifest -->
+    <meta name="theme-color" content="#005792">
 </head>
 
 <body>
@@ -34,14 +55,53 @@
 
             <div class="stats">
                 <div class="stat-item">
-                    5K+ <span>Verified Workers</span>
+                    <img src="assets/Logged in hustler.png" alt="Verified Workers icon"
+                        style="width:32px;height:32px;vertical-align:middle;"> 5K+ <span>Verified Workers</span>
                 </div>
                 <div class="stat-item">
-                    4.2★ <span>Avg Rating</span>
+                    <i class="fas fa-star" aria-label="Average Rating"></i> 4.2★ <span>Avg Rating</span>
                 </div>
                 <div class="stat-item">
-                    100% <span>No Fees</span>
+                    <i class="fas fa-percent" aria-label="No Fees"></i> 100% <span>No Fees</span>
                 </div>
+                <!-- Social Sharing Buttons -->
+                <div class="social-share" style="margin-top:1.5rem;">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=https://yourdomain.com" target="_blank"
+                        rel="noopener" title="Share on Facebook"><i class="fab fa-facebook fa-2x"></i></a>
+                    <a href="https://twitter.com/intent/tweet?url=https://yourdomain.com&text=Check%20out%20HustleHub!"
+                        target="_blank" rel="noopener" title="Share on Twitter"><i class="fab fa-twitter fa-2x"></i></a>
+                    <a href="https://wa.me/?text=Check%20out%20HustleHub!%20https://yourdomain.com" target="_blank"
+                        rel="noopener" title="Share on WhatsApp"><i class="fab fa-whatsapp fa-2x"></i></a>
+                </div>
+
+                <!-- Scroll to Top Button -->
+                <button id="scrollTopBtn" title="Scroll to top"
+                    style="display:none;position:fixed;bottom:2rem;right:2rem;z-index:1000;background:#005792;color:#fff;border:none;border-radius:50%;width:48px;height:48px;box-shadow:0 2px 8px rgba(0,0,0,0.2);font-size:2rem;cursor:pointer;transition:background 0.3s;"><i
+                        class="fas fa-arrow-up"></i></button>
+                <script>
+                    // Smooth scroll for anchor links
+                    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                        anchor.addEventListener('click', function (e) {
+                            e.preventDefault();
+                            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        });
+                    });
+
+                    // Scroll to Top Button
+                    const scrollTopBtn = document.getElementById('scrollTopBtn');
+                    window.addEventListener('scroll', function () {
+                        if (window.scrollY > 300) {
+                            scrollTopBtn.style.display = 'block';
+                        } else {
+                            scrollTopBtn.style.display = 'none';
+                        }
+                    });
+                    scrollTopBtn && scrollTopBtn.addEventListener('click', function () {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+                </script>
             </div>
         </div>
     </section>
@@ -94,4 +154,5 @@
         </div>
     </section>
 </body>
+
 </html>
