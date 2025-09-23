@@ -1,11 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hustlers | HustleHub</title>
+  <!-- SEO: Primary metadata -->
+  <meta name="description"
+    content="Browse verified local hustlers and service providers. Filter by location, skill, and rate to find the right professional for your job.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="/browse.html">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HustleHub | Browse Hustlers">
+  <meta property="og:description"
+    content="Browse verified local hustlers and service providers. Filter by location and skill to find the right person for the job.">
+  <meta property="og:image" content="/assets/og-image.png">
+  <meta property="og:url" content="/browse.html">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="HustleHub | Browse Hustlers">
+  <meta name="twitter:description" content="Browse verified local hustlers and service providers.">
+  <meta name="twitter:image" content="/assets/og-image.png">
+
+  <!-- Structured data (Organization) -->
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LocalBusiness","name":"HustleHub","image":"/assets/og-image.png","@id":"/","url":"/","telephone":"+27-27-000-0000","address":{"@type":"PostalAddress","streetAddress":"123 Main St","addressLocality":"City","addressRegion":"Province","postalCode":"0000","addressCountry":"ZA"},"openingHours":"Mo-Fr 08:00-18:00"}
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="styles/browse.css" />
 </head>
@@ -21,7 +46,7 @@
   <main>
     <section class="hustlers-section">
       <h2>Available Hustlers Near You</h2>
-      
+
       <!-- New: Search and Filter Bar -->
       <div class="filters-bar">
         <div class="search-box">
@@ -42,9 +67,9 @@
           <option value="5000+">ZAR 5000+</option>
         </select>
       </div>
-      
+
       <div id="hustlersList" class="card-grid"></div>
-      
+
       <!-- New: No results message -->
       <div id="noResults" style="display: none; text-align: center; padding: 2rem;">
         <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
@@ -56,4 +81,5 @@
 
   <script type="module" src="script/browse.js"></script>
 </body>
+
 </html>
